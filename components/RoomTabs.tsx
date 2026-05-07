@@ -1,6 +1,5 @@
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { useState } from 'react';
-import { Plus } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
 
 type Props = {
   rooms: string[];
@@ -10,7 +9,18 @@ type Props = {
 };
 
 export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScroll }: Props) {
-  const [active, setActive] = useState(rooms[0]);
+  const [active, setActive] = useState<string>(rooms[0] ?? '');
+
+  useEffect(() => {
+    if (rooms.length === 0) {
+      if (active !== '') setActive('');
+      return;
+    }
+
+    if (!active || !rooms.includes(active)) {
+      setActive(rooms[0]);
+    }
+  }, [rooms, active]);
 
   const TabList = () => (
     <>
@@ -33,7 +43,7 @@ export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScro
 
           marginRight: 10,
         }}>
-        <Plus color="white" size={18} />
+        <Text className="text-white">+</Text>
       </Pressable>
 
       {/* tabs */}

@@ -1,5 +1,4 @@
-import { View, Pressable, Image } from 'react-native';
-import { ChevronLeft, Menu, Trash2 } from 'lucide-react-native';
+import { View, Pressable, Image, Text } from 'react-native';
 
 type Props = {
   onDeleteRoom?: () => void;
@@ -33,7 +32,7 @@ export default function Navbar({ onDeleteRoom }: Props) {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <ChevronLeft color="white" />
+        <Text className="text-white">←</Text>
       </Pressable>
 
       {/* right side */}
@@ -56,7 +55,7 @@ export default function Navbar({ onDeleteRoom }: Props) {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Trash2 color="white" size={18} />
+          <Text className="text-white">🗑️</Text>
         </Pressable>
 
         {/* menu */}
@@ -75,7 +74,7 @@ export default function Navbar({ onDeleteRoom }: Props) {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Menu color="white" />
+          <Text className="text-white">⋯</Text>
         </Pressable>
 
         {/* avatar */}

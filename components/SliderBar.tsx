@@ -1,96 +1,153 @@
+// SensorCard.tsx
+
+import React from 'react';
 import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Power, Lightbulb } from 'lucide-react-native';
-import Slider from '@react-native-community/slider';
-import { useState } from 'react';
+import { useSensorData } from '../services/sensorDataService';
 
-export default function SliderBar() {
-  const [value, setValue] = useState(46);
+export default function SensorCard() {
+  const { data, isConnected } = useSensorData();
 
   return (
-    <View
-      style={{
-        borderRadius: 24,
-        overflow: 'hidden',
-        marginTop: 20,
-      }}>
+    <View style={{ borderRadius: 24, overflow: 'hidden', marginTop: 20 }}>
       <LinearGradient
         colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
         style={{
           padding: 18,
           borderRadius: 24,
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.15)',
-          backgroundColor: 'transparent',
         }}>
-        {/* title row */}
+        {/* Connection Status */}
+        <Text
+          style={{
+            color: isConnected ? '#22c55e' : '#ef4444',
+            marginBottom: 10,
+            fontSize: 12,
+          }}>
+          {isConnected ? '● Live Data' : '● Disconnected'}
+        </Text>
 
+        {/* Temperature */}
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
             alignItems: 'center',
+            marginBottom: 12,
           }}>
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 18,
-              fontWeight: '600',
-            }}>
-            Light 1
+          <Text className="text-2xl" style={{ color: '#fb923c' }}>
+            °C
           </Text>
 
-          <View
+          <Text
             style={{
-              backgroundColor: 'rgba(255,255,255,0.15)',
-              width: 38,
-              height: 38,
-              borderRadius: 19,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderWidth: 1,
-              borderColor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              fontSize: 16,
+              marginLeft: 10,
+              flex: 1,
             }}>
-            <Power size={18} color="white" />
-          </View>
+            Temperature
+          </Text>
+
+          <Text
+            style={{
+              color: '#fb923c',
+              fontSize: 18,
+              fontWeight: '700',
+            }}>
+            {data.temperature}
+          </Text>
         </View>
 
-        {/* slider */}
-
+        {/* Humidity */}
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 18,
+            marginBottom: 12,
           }}>
-          <Lightbulb size={20} color="rgba(255,255,255,0.8)" />
-
-          <View style={{ flex: 1 }}>
-            <Slider
-              minimumValue={0}
-              maximumValue={100}
-              value={value}
-              onValueChange={(v) => setValue(Math.round(v))}
-              minimumTrackTintColor="#fb923c"
-              maximumTrackTintColor="rgba(255,255,255,0.15)"
-              thumbTintColor="#ffffff"
-              style={{
-                width: '100%',
-                height: 40,
-              }}
-            />
-          </View>
+          <Text className="text-2xl" style={{ color: '#38bdf8' }}>
+            %
+          </Text>
 
           <Text
             style={{
               color: 'white',
-              fontWeight: '600',
-              width: 45,
-              textAlign: 'right',
+              fontSize: 16,
+              marginLeft: 10,
+              flex: 1,
             }}>
-            {value}%
+            Humidity
+          </Text>
+
+          <Text
+            style={{
+              color: '#38bdf8',
+              fontSize: 18,
+              fontWeight: '700',
+            }}>
+            {data.humidity}%
+          </Text>
+        </View>
+
+        {/* Students */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 12,
+          }}>
+          <Text className="text-2xl" style={{ color: '#a78bfa' }}>
+            👥
+          </Text>
+
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 16,
+              marginLeft: 10,
+              flex: 1,
+            }}>
+            Student Count
+          </Text>
+
+          <Text
+            style={{
+              color: '#a78bfa',
+              fontSize: 18,
+              fontWeight: '700',
+            }}>
+            {data.student}
+          </Text>
+        </View>
+
+        {/* Light */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Text className="text-2xl" style={{ color: '#fbbf24' }}>
+            💡
+          </Text>
+
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 16,
+              marginLeft: 10,
+              flex: 1,
+            }}>
+            Light Level
+          </Text>
+
+          <Text
+            style={{
+              color: '#fbbf24',
+              fontSize: 18,
+              fontWeight: '700',
+            }}>
+            {data.light}
           </Text>
         </View>
       </LinearGradient>

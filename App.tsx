@@ -3,51 +3,74 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, View, Text, TextInput, Modal, Pressable } from 'react-native';
 import { useState } from 'react';
 
-import './global.css';
-
-import DeviceCard from './components/DeviceCard';
 import SliderBar from './components/SliderBar';
-import RoomTabs from 'components/RoomTabs';
-import Navbar from 'components/Navbar';
+import RoomTabs from './components/RoomTabs';
+import Navbar from './components/Navbar';
+import FanCard from './components/FanCard';
+import LightCard from './components/LightCard';
+import { useSensorData } from './services/sensorDataService';
 
 export default function App() {
   const [rooms, setRooms] = useState(['NB 001', 'NB 104', 'NB 105']);
   const [showModal, setShowModal] = useState(false);
   const [newRoom, setNewRoom] = useState('');
 
+  // Fetch all data from centralized service
+  const { socket } = useSensorData();
+
   const addRoom = () => {
     if (newRoom.trim() !== '') {
-      setRooms([...rooms, newRoom]);
-
+      setRooms((prev) => [...prev, newRoom.trim()]);
       setNewRoom('');
-
       setShowModal(false);
     }
   };
+
+  const deleteRoom = () => {
+    if (rooms.length === 0) return;
+
+    setRooms((prev) => prev.slice(0, -1));
+  };
+
   return (
     <SafeAreaProvider>
       <LinearGradient colors={['#bc6926', '#684311', '#1f1508']} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1, padding: 20 }}>
-          <Navbar
-            onDeleteRoom={() => {
-              setRooms(rooms.slice(0, -1));
-            }}
-          />
-          <Text className="mb-1 mt-4 text-4xl font-bold text-white">Welcome to</Text>
-          <Text className="mb-4 text-white">Department of Computer Science & Engineering</Text>
+          {/* Navbar */}
+          <Navbar onDeleteRoom={deleteRoom} />
 
-          {/* devices */}
+          {/* Header */}
+          <Text
+            style={{
+              marginTop: 16,
+              fontSize: 32,
+              fontWeight: 'bold',
+              color: 'white',
+            }}>
+            Welcome to
+          </Text>
 
+          <Text
+            style={{
+              marginBottom: 16,
+              color: 'white',
+            }}>
+            Department of Computer Science & Engineering
+          </Text>
+
+          {/* Content */}
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 40 }}>
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
+            {/* Room Tabs */}
+            <View style={{ flexDirection: 'row' }}>
               <RoomTabs rooms={rooms} onAddRoom={() => setShowModal(true)} setHorizontalScroll />
             </View>
-            <SliderBar />
+
+            {/* Sensor Card */}
+            {socket && <SliderBar />}
+
+            {/* Devices */}
             <View
               style={{
                 flexDirection: 'row',
@@ -55,40 +78,33 @@ export default function App() {
                 justifyContent: 'space-between',
                 marginTop: 20,
               }}>
-              <DeviceCard title="Fan 1" />
-              <DeviceCard title="Fan 2" />
-
-              <DeviceCard title="Light 1" />
-              <DeviceCard title="Light 2" />
+              <FanCard title="Fan 1" />
+              <FanCard title="Fan 2" />
+              <LightCard title="Light 1" />
+              <LightCard title="Light 2" />
             </View>
           </ScrollView>
+
+          {/* Modal */}
           <Modal visible={showModal} transparent animationType="fade">
             <View
               style={{
                 flex: 1,
-
                 justifyContent: 'center',
-
                 alignItems: 'center',
-
                 backgroundColor: 'rgba(0,0,0,0.4)',
               }}>
               <View
                 style={{
                   width: '80%',
-
                   backgroundColor: '#2b1a0a',
-
                   padding: 20,
-
                   borderRadius: 20,
                 }}>
                 <Text
                   style={{
                     color: 'white',
-
                     fontSize: 18,
-
                     marginBottom: 10,
                   }}>
                   Enter Room Name
@@ -101,15 +117,10 @@ export default function App() {
                   placeholderTextColor="#ffffff66"
                   style={{
                     borderWidth: 1,
-
                     borderColor: 'rgba(255,255,255,0.2)',
-
                     borderRadius: 10,
-
                     padding: 10,
-
                     color: 'white',
-
                     marginBottom: 15,
                   }}
                 />
@@ -117,7 +128,6 @@ export default function App() {
                 <View
                   style={{
                     flexDirection: 'row',
-
                     justifyContent: 'space-between',
                   }}>
                   <Pressable onPress={() => setShowModal(false)}>

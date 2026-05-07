@@ -1,13 +1,36 @@
 import { View, Text, Pressable } from 'react-native';
-import { Lightbulb } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getGlobalSocket } from '../services/sensorDataService';
 
-type DeviceCardProps = {
+type LightCardProps = {
   title: string;
 };
 
-export default function DeviceCard({ title }: DeviceCardProps) {
-  const [isOn, setIsOn] = useState(true);
+export default function LightCard({ title }: LightCardProps) {
+  const [isOn, setIsOn] = useState(false);
+
+  useEffect(() => {
+    const socket = getGlobalSocket();
+    if (!socket) return;
+
+    socket.on('classroom_update', (payload) => {
+      console.log('📡 Light Data:', payload.light);
+
+      // 🌙 Dark → Light ON
+      if (payload.light === 'Dark') {
+        setIsOn(true);
+      }
+
+      // ☀️ Bright → Light OFF
+      if (payload.light === 'Bright') {
+        setIsOn(false);
+      }
+    });
+
+    return () => {
+      socket.off('classroom_update');
+    };
+  }, []);
 
   return (
     <View
@@ -19,37 +42,29 @@ export default function DeviceCard({ title }: DeviceCardProps) {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
         marginBottom: 14,
-        shadowOpacity: 0.25,
-        shadowRadius: 20,
       }}>
       {/* top row */}
-
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        {/* icon circle */}
-
+        {/* icon */}
         <View
           style={{
             width: 46,
             height: 46,
             borderRadius: 23,
             backgroundColor: 'rgba(255,255,255,0.15)',
-            borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.2)',
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Lightbulb color="white" size={20} />
+          <Text style={{ color: 'white' }}>💡</Text>
         </View>
 
         {/* toggle */}
-
         <Pressable
-          onPress={() => setIsOn(!isOn)}
           style={{
             width: 42,
             height: 24,
@@ -70,7 +85,6 @@ export default function DeviceCard({ title }: DeviceCardProps) {
       </View>
 
       {/* title */}
-
       <Text
         style={{
           color: 'white',
@@ -82,7 +96,6 @@ export default function DeviceCard({ title }: DeviceCardProps) {
       </Text>
 
       {/* status */}
-
       <View
         style={{
           marginTop: 8,
@@ -92,29 +105,13 @@ export default function DeviceCard({ title }: DeviceCardProps) {
           paddingVertical: 4,
           borderRadius: 20,
         }}>
-        <View
+        <Text
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
+            color: 'white',
+            fontSize: 12,
           }}>
-          <View
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: isOn ? '#22c55e' : '#ef4444',
-            }}
-          />
-
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 12,
-            }}>
-            {isOn ? 'ON' : 'OFF'}
-          </Text>
-        </View>
+          {isOn ? 'ON' : 'OFF'}
+        </Text>
       </View>
     </View>
   );
