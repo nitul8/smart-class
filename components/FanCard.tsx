@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from 'react-native';
 import { useState, useEffect } from 'react';
-import { getGlobalSocket } from '../services/sensorDataService';
+import { getGlobalClient } from '../services/sensorDataService';
 
 type FanCardProps = {
   title: string;
@@ -10,23 +10,30 @@ export default function FanCard({ title }: FanCardProps) {
   const [isOn, setIsOn] = useState(false);
 
   useEffect(() => {
-    const socket = getGlobalSocket();
-    if (!socket) return;
+    const client = getGlobalClient();
+    if (!client) return;
 
-    socket.on('classroom_update', (payload) => {
-      console.log('💧 Humidity:', payload.humidity);
+    const handleMessage = (topic: string, message: any) => {
+      if (topic !== 'smartclassroom/data') return;
+      try {
+        const payload = JSON.parse(message.toString());
 
-      // humidity > 82 → FAN ON
-      if (payload.humidity > 82) {
-        setIsOn(true);
-      } else {
-        // humidity <= 82 → FAN OFF
-        setIsOn(false);
+        console.log('💧 Humidity:', payload.humidity);
+
+        if (payload.humidity > 82) {
+          setIsOn(true);
+        } else {
+          setIsOn(false);
+        }
+      } catch (e) {
+        console.log('❌ JSON parse error in FanCard:', e);
       }
-    });
+    };
+
+    client.on('message', handleMessage);
 
     return () => {
-      socket.off('classroom_update');
+      client.removeListener('message', handleMessage);
     };
   }, []);
 
