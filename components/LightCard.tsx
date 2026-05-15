@@ -1,37 +1,11 @@
 import { View, Text, Pressable } from 'react-native';
-import { useState, useEffect } from 'react';
-import { getGlobalSocket } from '../services/sensorDataService';
 
 type LightCardProps = {
   title: string;
+  isOn: boolean;
 };
 
-export default function LightCard({ title }: LightCardProps) {
-  const [isOn, setIsOn] = useState(false);
-
-  useEffect(() => {
-    const socket = getGlobalSocket();
-    if (!socket) return;
-
-    socket.on('classroom_update', (payload) => {
-      console.log('📡 Light Data:', payload.light);
-
-      // 🌙 Dark → Light ON
-      if (payload.light === 'Dark') {
-        setIsOn(true);
-      }
-
-      // ☀️ Bright → Light OFF
-      if (payload.light === 'Bright') {
-        setIsOn(false);
-      }
-    });
-
-    return () => {
-      socket.off('classroom_update');
-    };
-  }, []);
-
+export default function LightCard({ title, isOn }: LightCardProps) {
   return (
     <View
       style={{

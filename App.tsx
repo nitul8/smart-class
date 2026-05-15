@@ -16,7 +16,7 @@ export default function App() {
   const [newRoom, setNewRoom] = useState('');
 
   // Fetch all data from centralized service
-  const { socket } = useSensorData();
+  const { socket, lightOn } = useSensorData();
 
   const addRoom = () => {
     if (newRoom.trim() !== '') {
@@ -80,8 +80,8 @@ export default function App() {
               }}>
               <FanCard title="Fan 1" />
               <FanCard title="Fan 2" />
-              <LightCard title="Light 1" />
-              <LightCard title="Light 2" />
+              <LightCard title="Light 1" isOn={lightOn} />
+              <LightCard title="Light 2" isOn={lightOn} />
             </View>
           </ScrollView>
 

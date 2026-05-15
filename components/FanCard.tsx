@@ -16,11 +16,11 @@ export default function FanCard({ title }: FanCardProps) {
     socket.on('classroom_update', (payload) => {
       console.log('💧 Humidity:', payload.humidity);
 
-      // humidity > 70 → FAN ON
-      if (payload.humidity > 70) {
+      // humidity > 82 → FAN ON
+      if (payload.humidity > 82) {
         setIsOn(true);
       } else {
-        // humidity <= 70 → FAN OFF
+        // humidity <= 82 → FAN OFF
         setIsOn(false);
       }
     });
