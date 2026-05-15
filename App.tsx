@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, View, Text, TextInput, Modal, Pressable } from 'react-native';
 import { useState } from 'react';
 
-import SliderBar from './components/SliderBar';
+import SensorCard from './components/SensorCard';
 import RoomTabs from './components/RoomTabs';
 import Navbar from './components/Navbar';
 import FanCard from './components/FanCard';
@@ -68,7 +68,7 @@ export default function App() {
             </View>
 
             {/* Sensor Card */}
-            {socket && <SliderBar />}
+            {socket && <SensorCard />}
 
             {/* Devices */}
             <View

@@ -15,7 +15,7 @@ type UseSensorDataReturn = {
   lightOn: boolean;
 };
 
-const SOCKET_URL = 'http://192.168.2.77:5000';
+const SOCKET_URL = 'http://10.220.81.86:5000';
 let globalSocket: Socket | null = null;
 
 // Initialize global socket once

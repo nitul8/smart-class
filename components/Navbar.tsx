@@ -1,4 +1,5 @@
-import { View, Pressable, Image, Text } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
+import { Menu, Trash2, ArrowLeft } from 'lucide-react-native';
 
 type Props = {
   onDeleteRoom?: () => void;
@@ -9,75 +10,50 @@ export default function Navbar({ onDeleteRoom }: Props) {
     <View
       style={{
         flexDirection: 'row',
-
         justifyContent: 'space-between',
-
         alignItems: 'center',
-
         marginBottom: 20,
       }}>
-      {/* back button */}
-
       <Pressable
         style={{
           width: 44,
           height: 44,
-
           borderRadius: 22,
-
           borderWidth: 1,
-
           borderColor: 'rgba(255,255,255,0.3)',
-
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text className="text-white">←</Text>
+        <ArrowLeft color="white" />
       </Pressable>
 
-      {/* right side */}
-
       <View style={{ flexDirection: 'row', gap: 12 }}>
-        {/* delete room */}
-
         <Pressable
           onPress={onDeleteRoom}
           style={{
             width: 44,
             height: 44,
-
             borderRadius: 22,
-
             borderWidth: 1,
-
             borderColor: 'rgba(255,255,255,0.3)',
-
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text className="text-white">🗑️</Text>
+          <Trash2 color="white" />
         </Pressable>
-
-        {/* menu */}
 
         <Pressable
           style={{
             width: 44,
             height: 44,
-
             borderRadius: 22,
-
             borderWidth: 1,
-
             borderColor: 'rgba(255,255,255,0.3)',
-
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text className="text-white">⋯</Text>
+          <Menu color="white" />
         </Pressable>
-
-        {/* avatar */}
 
         <Image
           source={{
@@ -86,11 +62,8 @@ export default function Navbar({ onDeleteRoom }: Props) {
           style={{
             width: 44,
             height: 44,
-
             borderRadius: 22,
-
             borderWidth: 2,
-
             borderColor: '#fb923c',
           }}
         />
