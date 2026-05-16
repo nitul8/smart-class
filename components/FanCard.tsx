@@ -1,42 +1,13 @@
 import { View, Text, Pressable } from 'react-native';
-import { useState, useEffect } from 'react';
-import { getGlobalClient } from '../services/sensorDataService';
 
 type FanCardProps = {
   title: string;
+  isOn: boolean;
+  isAutoMode: boolean;
+  onToggle: (state: boolean) => void;
 };
 
-export default function FanCard({ title }: FanCardProps) {
-  const [isOn, setIsOn] = useState(false);
-
-  useEffect(() => {
-    const client = getGlobalClient();
-    if (!client) return;
-
-    const handleMessage = (topic: string, message: any) => {
-      if (topic !== 'smartclassroom/data') return;
-      try {
-        const payload = JSON.parse(message.toString());
-
-        console.log('💧 Humidity:', payload.humidity);
-
-        if (payload.humidity > 82) {
-          setIsOn(true);
-        } else {
-          setIsOn(false);
-        }
-      } catch (e) {
-        console.log('❌ JSON parse error in FanCard:', e);
-      }
-    };
-
-    client.on('message', handleMessage);
-
-    return () => {
-      client.removeListener('message', handleMessage);
-    };
-  }, []);
-
+export default function FanCard({ title, isOn, isAutoMode, onToggle }: FanCardProps) {
   return (
     <View
       style={{
@@ -74,12 +45,19 @@ export default function FanCard({ title }: FanCardProps) {
 
         {/* toggle */}
         <Pressable
+          disabled={isAutoMode}
+          onPress={() => onToggle(!isOn)}
           style={{
             width: 42,
             height: 24,
             borderRadius: 20,
             justifyContent: 'center',
-            backgroundColor: isOn ? '#fb923c' : 'rgba(255,255,255,0.15)',
+            backgroundColor: isAutoMode
+              ? 'rgba(255,255,255,0.1)'
+              : isOn
+                ? '#fb923c'
+                : 'rgba(255,255,255,0.15)',
+            opacity: isAutoMode ? 0.65 : 1,
           }}>
           <View
             style={{
@@ -134,7 +112,7 @@ export default function FanCard({ title }: FanCardProps) {
               color: 'white',
               fontSize: 12,
             }}>
-            {isOn ? 'ON' : 'OFF'}
+            {isAutoMode ? 'AUTO' : isOn ? 'ON' : 'OFF'}
           </Text>
         </View>
       </View>

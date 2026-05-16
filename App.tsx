@@ -14,9 +14,11 @@ export default function App() {
   const [rooms, setRooms] = useState(['NB 001', 'NB 104', 'NB 105']);
   const [showModal, setShowModal] = useState(false);
   const [newRoom, setNewRoom] = useState('');
+  const [isAutoMode, setIsAutoMode] = useState(false);
 
   // Fetch all data from centralized service
-  const { socket, lightOn } = useSensorData();
+  const { socket, data, isConnected, lightOn, fanOn, setLightManualState, setFanManualState } =
+    useSensorData(isAutoMode);
 
   const addRoom = () => {
     if (newRoom.trim() !== '') {
@@ -37,7 +39,11 @@ export default function App() {
       <LinearGradient colors={['#bc6926', '#684311', '#1f1508']} style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1, padding: 20 }}>
           {/* Navbar */}
-          <Navbar onDeleteRoom={deleteRoom} />
+          <Navbar
+            onDeleteRoom={deleteRoom}
+            isAutoMode={isAutoMode}
+            onToggleAutoMode={setIsAutoMode}
+          />
 
           {/* Header */}
           <Text
@@ -68,7 +74,7 @@ export default function App() {
             </View>
 
             {/* Sensor Card */}
-            {socket && <SensorCard />}
+            {socket && <SensorCard data={data} isConnected={isConnected} />}
 
             {/* Devices */}
             <View
@@ -78,10 +84,30 @@ export default function App() {
                 justifyContent: 'space-between',
                 marginTop: 20,
               }}>
-              <FanCard title="Fan 1" />
-              <FanCard title="Fan 2" />
-              <LightCard title="Light 1" isOn={lightOn} />
-              <LightCard title="Light 2" isOn={lightOn} />
+              <FanCard
+                title="Fan 1"
+                isOn={fanOn}
+                isAutoMode={isAutoMode}
+                onToggle={setFanManualState}
+              />
+              <FanCard
+                title="Fan 2"
+                isOn={fanOn}
+                isAutoMode={isAutoMode}
+                onToggle={setFanManualState}
+              />
+              <LightCard
+                title="Light 1"
+                isOn={lightOn}
+                isAutoMode={isAutoMode}
+                onToggle={setLightManualState}
+              />
+              <LightCard
+                title="Light 2"
+                isOn={lightOn}
+                isAutoMode={isAutoMode}
+                onToggle={setLightManualState}
+              />
             </View>
           </ScrollView>
 

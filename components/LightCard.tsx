@@ -3,9 +3,11 @@ import { View, Text, Pressable } from 'react-native';
 type LightCardProps = {
   title: string;
   isOn: boolean;
+  isAutoMode: boolean;
+  onToggle: (state: boolean) => void;
 };
 
-export default function LightCard({ title, isOn }: LightCardProps) {
+export default function LightCard({ title, isOn, isAutoMode, onToggle }: LightCardProps) {
   return (
     <View
       style={{
@@ -39,12 +41,19 @@ export default function LightCard({ title, isOn }: LightCardProps) {
 
         {/* toggle */}
         <Pressable
+          disabled={isAutoMode}
+          onPress={() => onToggle(!isOn)}
           style={{
             width: 42,
             height: 24,
             borderRadius: 20,
             justifyContent: 'center',
-            backgroundColor: isOn ? '#fb923c' : 'rgba(255,255,255,0.15)',
+            backgroundColor: isAutoMode
+              ? 'rgba(255,255,255,0.1)'
+              : isOn
+                ? '#fb923c'
+                : 'rgba(255,255,255,0.15)',
+            opacity: isAutoMode ? 0.65 : 1,
           }}>
           <View
             style={{
@@ -84,7 +93,7 @@ export default function LightCard({ title, isOn }: LightCardProps) {
             color: 'white',
             fontSize: 12,
           }}>
-          {isOn ? 'ON' : 'OFF'}
+          {isAutoMode ? 'AUTO' : isOn ? 'ON' : 'OFF'}
         </Text>
       </View>
     </View>

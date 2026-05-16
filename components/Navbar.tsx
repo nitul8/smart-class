@@ -3,9 +3,11 @@ import { Menu, Trash2, ArrowLeft } from 'lucide-react-native';
 
 type Props = {
   onDeleteRoom?: () => void;
+  isAutoMode: boolean;
+  onToggleAutoMode: (nextValue: boolean) => void;
 };
 
-export default function Navbar({ onDeleteRoom }: Props) {
+export default function Navbar({ onDeleteRoom, isAutoMode, onToggleAutoMode }: Props) {
   return (
     <View
       style={{
@@ -55,18 +57,22 @@ export default function Navbar({ onDeleteRoom }: Props) {
           <Menu color="white" />
         </Pressable>
 
-        <Image
-          source={{
-            uri: 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png',
-          }}
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 22,
-            borderWidth: 2,
-            borderColor: '#fb923c',
-          }}
-        />
+        <Pressable onPress={() => onToggleAutoMode(!isAutoMode)}>
+          <Image
+            source={{
+              uri: isAutoMode
+                ? 'https://uxwing.com/wp-content/themes/uxwing/download/internet-network-technology/robot-bot-icon.png'
+                : 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png',
+            }}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              borderWidth: 2,
+              borderColor: '#fb923c',
+            }}
+          />
+        </Pressable>
       </View>
     </View>
   );

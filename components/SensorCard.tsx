@@ -1,11 +1,14 @@
 import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSensorData } from '../services/sensorDataService';
+import { SensorData } from '../services/sensorDataService';
 import { ThermometerSun, Droplet, Users, SunDim } from 'lucide-react-native';
 
-export default function SensorCard() {
-  const { data, isConnected } = useSensorData();
+type SensorCardProps = {
+  data: SensorData;
+  isConnected: boolean;
+};
 
+export default function SensorCard({ data, isConnected }: SensorCardProps) {
   return (
     <View style={{ borderRadius: 20, overflow: 'hidden', marginTop: 20 }}>
       <LinearGradient
