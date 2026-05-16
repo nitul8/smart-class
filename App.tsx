@@ -7,8 +7,8 @@ import SensorCard from './components/SensorCard';
 import RoomTabs from './components/RoomTabs';
 import Navbar from './components/Navbar';
 import FanCard from './components/FanCard';
-import LightCard from './components/LightCard';
 import { useSensorData } from './services/sensorDataService';
+import LightCard from './components/LightCard';
 
 export default function App() {
   const [rooms, setRooms] = useState(['NB 001', 'NB 104', 'NB 105']);
@@ -16,9 +16,10 @@ export default function App() {
   const [newRoom, setNewRoom] = useState('');
   const [isAutoMode, setIsAutoMode] = useState(false);
 
-  // Fetch all data from centralized service
-  const { socket, data, isConnected, lightOn, fanOn, setLightManualState, setFanManualState } =
-    useSensorData(isAutoMode);
+  const { socket, data, isConnected, fanOn, setFanManualState } = useSensorData(isAutoMode);
+  const isRoomOccupied = data.student > 0;
+  const isFanOn = isRoomOccupied && fanOn;
+  const isLightOn = isRoomOccupied && data.light === 'Bright';
 
   const addRoom = () => {
     if (newRoom.trim() !== '') {
@@ -85,28 +86,16 @@ export default function App() {
                 marginTop: 20,
               }}>
               <FanCard
-                title="Fan 1"
-                isOn={fanOn}
-                isAutoMode={isAutoMode}
-                onToggle={setFanManualState}
-              />
-              <FanCard
-                title="Fan 2"
-                isOn={fanOn}
+                title="Fan"
+                isOn={isFanOn}
                 isAutoMode={isAutoMode}
                 onToggle={setFanManualState}
               />
               <LightCard
-                title="Light 1"
-                isOn={lightOn}
+                title="Light"
+                isOn={isLightOn}
                 isAutoMode={isAutoMode}
-                onToggle={setLightManualState}
-              />
-              <LightCard
-                title="Light 2"
-                isOn={lightOn}
-                isAutoMode={isAutoMode}
-                onToggle={setLightManualState}
+                onToggle={setFanManualState}
               />
             </View>
           </ScrollView>

@@ -5,8 +5,9 @@ export type SensorData = {
   temperature: number;
   humidity: number;
   student: number;
-  light?: string;
-  fan_status?: string;
+  light: string;
+  fan_status: 'ON' | 'OFF';
+  mode: 'AUTO' | 'MANUAL';
 };
 
 type UseSensorDataReturn = {
@@ -14,9 +15,7 @@ type UseSensorDataReturn = {
   socket?: MqttClient | null;
   data: SensorData;
   isConnected: boolean;
-  lightOn: boolean;
   fanOn: boolean;
-  setLightManualState: (state: boolean) => void;
   setFanManualState: (state: boolean) => void;
 };
 
@@ -27,9 +26,7 @@ const USERNAME = 'nitulpi';
 const PASSWORD = 'Articuno01#';
 
 const DATA_TOPIC = 'smartclassroom/data';
-const LIGHT_TOPIC = 'smartclassroom/light';
-const FAN_TOPIC = 'smartclassroom/fan';
-const MODE_TOPIC = 'smartclassroom/mode';
+const CONTROL_TOPIC = 'smartclassroom/fan';
 
 const initializeMQTT = (): MqttClient => {
   if (globalClient) {
@@ -54,7 +51,6 @@ export const useSensorData = (isAutoMode: boolean): UseSensorDataReturn => {
 
   const [isConnected, setIsConnected] = useState(false);
 
-  const [lightOn, setLightOn] = useState(false);
   const [fanOn, setFanOn] = useState(false);
 
   const [data, setData] = useState<SensorData>({
@@ -63,18 +59,8 @@ export const useSensorData = (isAutoMode: boolean): UseSensorDataReturn => {
     student: 0,
     light: 'Bright',
     fan_status: 'OFF',
+    mode: 'AUTO',
   });
-
-  const setLightManualState = (state: boolean) => {
-    if (isAutoMode) return;
-
-    globalClient?.publish(MODE_TOPIC, 'manual');
-    setLightOn(state);
-
-    if (globalClient) {
-      globalClient.publish(LIGHT_TOPIC, state ? 'on' : 'off');
-    }
-  };
 
   const setFanManualState = (state: boolean) => {
     if (isAutoMode) return;
@@ -82,8 +68,8 @@ export const useSensorData = (isAutoMode: boolean): UseSensorDataReturn => {
     setFanOn(state);
 
     if (globalClient) {
-      globalClient.publish(MODE_TOPIC, 'manual');
-      globalClient.publish(FAN_TOPIC, state ? 'on' : 'off');
+      globalClient.publish(CONTROL_TOPIC, 'manual');
+      globalClient.publish(CONTROL_TOPIC, state ? 'on' : 'off');
     }
   };
 
@@ -123,15 +109,17 @@ export const useSensorData = (isAutoMode: boolean): UseSensorDataReturn => {
 
           console.log('📡 Data:', payload);
 
-          const newData = {
+          const newData: SensorData = {
             temperature: payload.temperature ?? 0,
             humidity: payload.humidity ?? 0,
             student: payload.student ?? 0,
             light: payload.light ?? 'Bright',
-            fan_status: payload.fan_status ?? 'OFF',
+            fan_status: payload.fan_status === 'ON' ? 'ON' : 'OFF',
+            mode: payload.mode === 'MANUAL' ? 'MANUAL' : 'AUTO',
           };
 
           setData(newData);
+          setFanOn(newData.student > 0 && newData.fan_status === 'ON');
         } catch (error) {
           console.log('❌ JSON Parse Error:', error);
         }
@@ -144,53 +132,24 @@ export const useSensorData = (isAutoMode: boolean): UseSensorDataReturn => {
   }, []);
 
   useEffect(() => {
-    globalClient?.publish(MODE_TOPIC, isAutoMode ? 'auto' : 'manual');
+    globalClient?.publish(CONTROL_TOPIC, isAutoMode ? 'auto' : 'manual');
   }, [isAutoMode]);
-
-  useEffect(() => {
-    if (!isAutoMode) return;
-
-    const shouldLightBeOn = data.light === 'Dark';
-    const shouldFanBeOn = data.humidity > 82;
-
-    if (shouldLightBeOn !== lightOn) {
-      console.log(shouldLightBeOn ? '💡 Turning ON lights' : '💡 Turning OFF lights');
-      setLightOn(shouldLightBeOn);
-      globalClient?.publish(LIGHT_TOPIC, shouldLightBeOn ? 'on' : 'off');
-    }
-
-    if (shouldFanBeOn !== fanOn) {
-      console.log(shouldFanBeOn ? '🌀 Turning ON fan' : '🌀 Turning OFF fan');
-      setFanOn(shouldFanBeOn);
-      globalClient?.publish(FAN_TOPIC, shouldFanBeOn ? 'on' : 'off');
-    }
-  }, [isAutoMode, data.light, data.humidity, lightOn, fanOn]);
 
   return {
     client,
-    socket: client,
     data,
     isConnected,
-    lightOn,
     fanOn,
-    setLightManualState,
     setFanManualState,
   };
 };
-// Note: `socket` is provided as an alias for backward compatibility
 
 export const getGlobalClient = (): MqttClient | null => {
   return globalClient;
 };
 
-export const toggleLights = (state: boolean) => {
-  if (!globalClient) return;
-
-  globalClient.publish(LIGHT_TOPIC, state ? 'on' : 'off');
-};
-
 export const toggleFan = (state: boolean) => {
   if (!globalClient) return;
 
-  globalClient.publish(FAN_TOPIC, state ? 'on' : 'off');
+  globalClient.publish(CONTROL_TOPIC, state ? 'on' : 'off');
 };
