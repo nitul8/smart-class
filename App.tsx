@@ -1,25 +1,33 @@
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, View, Text, TextInput, Modal, Pressable } from 'react-native';
+
+import { ScrollView, View, Text, TextInput, Modal, Pressable, StatusBar } from 'react-native';
+
 import { useState } from 'react';
 
 import SensorCard from './components/SensorCard';
 import RoomTabs from './components/RoomTabs';
 import Navbar from './components/Navbar';
 import FanCard from './components/FanCard';
-import { useSensorData } from './services/sensorDataService';
 import LightCard from './components/LightCard';
+
+import { useSensorData } from './services/sensorDataService';
 
 export default function App() {
   const [rooms, setRooms] = useState(['NB 001', 'NB 104', 'NB 105']);
+
   const [showModal, setShowModal] = useState(false);
   const [newRoom, setNewRoom] = useState('');
   const [isAutoMode, setIsAutoMode] = useState(false);
 
-  const { socket, data, isConnected, fanOn, setFanManualState } = useSensorData(isAutoMode);
+  const { client, data, isConnected, fanOn, lightOn, setFanManualState, setLightManualState } =
+    useSensorData(isAutoMode);
+
   const isRoomOccupied = data.student > 0;
-  const isFanOn = isRoomOccupied && fanOn;
-  const isLightOn = isRoomOccupied && data.light === 'Bright';
+
+  const isFanOn = isAutoMode ? isRoomOccupied && fanOn : fanOn;
+
+  const isLightOn = isAutoMode ? isRoomOccupied && data.light === 'Bright' : lightOn;
 
   const addRoom = () => {
     if (newRoom.trim() !== '') {
@@ -37,54 +45,97 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <LinearGradient colors={['#bc6926', '#684311', '#1f1508']} style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1, padding: 20 }}>
-          {/* Navbar */}
-          <Navbar
-            onDeleteRoom={deleteRoom}
-            isAutoMode={isAutoMode}
-            onToggleAutoMode={setIsAutoMode}
+      <StatusBar barStyle="light-content" />
+
+      <LinearGradient colors={['#1B1B1B', '#121212', '#0A0A0A']} style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          {/* Background Glow */}
+          <View
+            style={{
+              position: 'absolute',
+              top: -120,
+              right: -80,
+
+              width: 260,
+              height: 260,
+
+              borderRadius: 130,
+
+              backgroundColor: 'rgba(0,224,255,0.08)',
+            }}
           />
 
-          {/* Header */}
-          <Text
+          <View
             style={{
-              marginTop: 16,
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: 'white',
-            }}>
-            Welcome to
-          </Text>
+              position: 'absolute',
+              bottom: -100,
+              left: -60,
 
-          <Text
-            style={{
-              marginBottom: 16,
-              color: 'white',
-            }}>
-            Department of Computer Science & Engineering
-          </Text>
+              width: 220,
+              height: 220,
 
-          {/* Content */}
+              borderRadius: 110,
+
+              backgroundColor: 'rgba(253,186,33,0.06)',
+            }}
+          />
+
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 40 }}>
-            {/* Room Tabs */}
-            <View style={{ flexDirection: 'row' }}>
-              <RoomTabs rooms={rooms} onAddRoom={() => setShowModal(true)} setHorizontalScroll />
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingTop: 12,
+              paddingBottom: 40,
+            }}>
+            {/* Navbar */}
+            <Navbar
+              onDeleteRoom={deleteRoom}
+              isAutoMode={isAutoMode}
+              onToggleAutoMode={setIsAutoMode}
+            />
+
+            {/* Header */}
+            <View style={{ marginTop: 12 }}>
+              <Text style={{ color: 'gray', fontSize: 15, fontWeight: '500', marginBottom: 8 }}>
+                SMART CLASSROOM
+              </Text>
+              <Text style={{ fontSize: 22, fontWeight: '800', lineHeight: 30 }}>
+                <Text style={{ color: 'white' }}>Welcome to </Text>
+                <Text style={{ color: '#00E0FF' }}>
+                  Department of Computer Science & Engineering
+                </Text>
+              </Text>
             </View>
 
-            {/* Sensor Card */}
-            {socket && <SensorCard data={data} isConnected={isConnected} />}
+            {/* Room Tabs */}
+            <RoomTabs rooms={rooms} onAddRoom={() => setShowModal(true)} setHorizontalScroll />
 
-            {/* Devices */}
+            {/* Sensor Analytics */}
+            {client && <SensorCard data={data} isConnected={isConnected} />}
+
+            {/* Section Header */}
             <View
               style={{
+                marginTop: 30,
+                marginBottom: 18,
                 flexDirection: 'row',
-                flexWrap: 'wrap',
                 justifyContent: 'space-between',
-                marginTop: 20,
+                alignItems: 'center',
               }}>
+              <View>
+                <Text style={{ color: 'white', fontSize: 24, fontWeight: '700' }}>
+                  Smart Controls
+                </Text>
+
+                <Text style={{ marginTop: 4, color: '#ffffff80', fontSize: 14 }}>
+                  Manage connected classroom devices
+                </Text>
+              </View>
+            </View>
+
+            {/* Device Cards */}
+            <View
+              style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
               <FanCard
                 title="Fan"
                 isOn={isFanOn}
@@ -95,62 +146,93 @@ export default function App() {
                 title="Light"
                 isOn={isLightOn}
                 isAutoMode={isAutoMode}
-                onToggle={setFanManualState}
+                onToggle={setLightManualState}
               />
             </View>
           </ScrollView>
 
-          {/* Modal */}
+          {/* Add Room Modal */}
           <Modal visible={showModal} transparent animationType="fade">
             <View
               style={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: 'rgba(0,0,0,0.4)',
+                backgroundColor: 'rgba(0,0,0,0.65)',
+                padding: 24,
               }}>
               <View
                 style={{
-                  width: '80%',
-                  backgroundColor: '#2b1a0a',
-                  padding: 20,
-                  borderRadius: 20,
+                  width: '100%',
+                  backgroundColor: '#161616',
+                  borderRadius: 32,
+                  padding: 24,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.08)',
                 }}>
+                {/* Header */}
                 <Text
                   style={{
                     color: 'white',
-                    fontSize: 18,
-                    marginBottom: 10,
+                    fontSize: 26,
+                    fontWeight: '700',
                   }}>
-                  Enter Room Name
+                  Add New Room
                 </Text>
 
+                <Text style={{ marginTop: 6, color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
+                  Create and manage another classroom
+                </Text>
+
+                {/* Input */}
                 <TextInput
                   value={newRoom}
                   onChangeText={setNewRoom}
                   placeholder="eg. NB 201"
-                  placeholderTextColor="#ffffff66"
+                  placeholderTextColor="rgba(255,255,255,0.35)"
                   style={{
+                    marginTop: 24,
+                    height: 58,
+                    borderRadius: 18,
+                    backgroundColor: 'rgba(255,255,255,0.05)',
                     borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.2)',
-                    borderRadius: 10,
-                    padding: 10,
+                    borderColor: 'rgba(255,255,255,0.08)',
+                    paddingHorizontal: 18,
                     color: 'white',
-                    marginBottom: 15,
+                    fontSize: 16,
                   }}
                 />
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Pressable onPress={() => setShowModal(false)}>
-                    <Text style={{ color: '#ffffff99' }}>Cancel</Text>
+                {/* Buttons */}
+                <View style={{ flexDirection: 'row', marginTop: 28, gap: 14 }}>
+                  <Pressable
+                    onPress={() => setShowModal(false)}
+                    style={{
+                      flex: 1,
+                      height: 54,
+                      borderRadius: 18,
+                      backgroundColor: 'rgba(255,255,255,0.06)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, fontWeight: '600' }}>
+                      Cancel
+                    </Text>
                   </Pressable>
 
-                  <Pressable onPress={addRoom}>
-                    <Text style={{ color: '#fb923c' }}>Add</Text>
+                  {/* Add */}
+                  <Pressable
+                    onPress={addRoom}
+                    style={{
+                      flex: 1,
+                      height: 54,
+                      borderRadius: 18,
+                      backgroundColor: '#00E0FF',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{ color: '#111', fontSize: 15, fontWeight: '800' }}>Add Room</Text>
                   </Pressable>
                 </View>
               </View>

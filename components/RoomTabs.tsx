@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react-native';
+import { Plus, Circle } from 'lucide-react-native';
 
 type Props = {
   rooms: string[];
@@ -25,30 +25,25 @@ export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScro
 
   const TabList = () => (
     <>
-      {/* + button */}
-
+      {/* Add Room Button */}
       <Pressable
         onPress={onAddRoom}
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-
-          backgroundColor: 'rgba(255,255,255,0.12)',
-
+          width: 58,
+          height: 58,
+          borderRadius: 29,
+          backgroundColor: 'rgb(28, 28, 28)',
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.2)',
-
+          borderColor: 'rgba(255,255,255,0.08)',
           alignItems: 'center',
           justifyContent: 'center',
-
-          marginRight: 10,
+          marginRight: 14,
+          elevation: 6,
         }}>
-        <Plus color="white" />
+        <Plus size={24} color="white" />
       </Pressable>
 
-      {/* tabs */}
-
+      {/* Room Tabs */}
       {rooms.map((room) => {
         const selected = active === room;
 
@@ -60,28 +55,59 @@ export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScro
               onChange?.(room);
             }}
             style={{
+              minWidth: 130,
+              height: 58,
               paddingHorizontal: 18,
-              paddingVertical: 10,
-
-              borderRadius: 20,
-
-              backgroundColor: selected ? 'white' : 'rgba(255,255,255,0.12)',
-
+              borderRadius: 24,
+              backgroundColor: selected ? 'rgba(0,224,255,0.14)' : 'rgba(255,255,255,0.06)',
               borderWidth: 1,
-
-              borderColor: 'rgba(255,255,255,0.2)',
-
-              marginRight: 10,
+              borderColor: selected ? 'rgba(0,224,255,0.35)' : 'rgba(255,255,255,0.08)',
+              marginRight: 14,
+              justifyContent: 'center',
+              overflow: 'hidden',
             }}>
-            <Text
-              style={{
-                color: selected ? '#7c4a12' : 'white',
+            {/* Glow */}
+            {selected && (
+              <View
+                style={{
+                  position: 'absolute',
+                  width: 140,
+                  height: 140,
+                  borderRadius: 70,
+                  backgroundColor: 'rgba(0,224,255,0.12)',
+                  top: -40,
+                  right: -40,
+                }}
+              />
+            )}
 
-                fontWeight: '500',
-                fontSize: 16,
+            {/* Content */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}>
-              {room}
-            </Text>
+              {/* Room Name */}
+              <View>
+                <Text
+                  style={{
+                    color: selected ? '#00E0FF' : 'white',
+                    fontWeight: '700',
+                    fontSize: 18,
+                    letterSpacing: 0.3,
+                  }}>
+                  {room}
+                </Text>
+              </View>
+
+              {/* Status Dot */}
+              <Circle
+                size={10}
+                fill={selected ? '#22c55e' : '#ef4444'}
+                color={selected ? '#22c55e' : '#ef4444'}
+              />
+            </View>
           </Pressable>
         );
       })}
@@ -93,10 +119,11 @@ export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScro
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginVertical: 20 }}
+        style={{ marginVertical: 24 }}
         contentContainerStyle={{
           flexDirection: 'row',
           alignItems: 'center',
+          paddingRight: 10,
         }}>
         <TabList />
       </ScrollView>
@@ -108,8 +135,7 @@ export default function RoomTabs({ rooms, onChange, onAddRoom, setHorizontalScro
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-
-        marginVertical: 20,
+        marginVertical: 24,
       }}>
       <TabList />
     </View>

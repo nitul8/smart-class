@@ -1,100 +1,117 @@
 import { View, Text, Pressable } from 'react-native';
+import { Lightbulb } from 'lucide-react-native';
 
 type LightCardProps = {
   title: string;
   isOn: boolean;
   isAutoMode: boolean;
+  brightness?: number;
   onToggle: (state: boolean) => void;
 };
 
-export default function LightCard({ title, isOn, isAutoMode, onToggle }: LightCardProps) {
+export default function LightCard({
+  title,
+  isOn,
+  isAutoMode,
+  brightness = 60,
+  onToggle,
+}: LightCardProps) {
   return (
     <View
       style={{
         width: '48%',
-        padding: 16,
-        borderRadius: 22,
-        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 28,
+        padding: 18,
+        backgroundColor: '#FDBA212D',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
-        marginBottom: 14,
+        borderColor: '#ffffff33',
+        overflow: 'hidden',
       }}>
-      {/* top row */}
+      {/* Glow */}
+      <View
+        style={{
+          position: 'absolute',
+          width: 180,
+          height: 180,
+          borderRadius: 100,
+          backgroundColor: isOn ? '#FDBA212D' : '#ffffff08',
+          top: -60,
+          right: -60,
+        }}
+      />
+
+      {/* Top Row */}
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
         }}>
-        {/* icon */}
+        {/* Icon */}
         <View
           style={{
-            width: 46,
-            height: 46,
-            borderRadius: 23,
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            alignItems: 'center',
+            width: 58,
+            height: 58,
+            borderRadius: 29,
+            backgroundColor: isOn ? '#FDBA212D' : '#ffffff08',
+            borderWidth: 1,
+            borderColor: isOn ? '#FDBA2166' : '#ffffff33',
             justifyContent: 'center',
+            alignItems: 'center',
           }}>
-          <Text style={{ color: 'white' }}>💡</Text>
+          <Lightbulb size={28} color={isOn ? '#FDBA21' : '#ffffffcc'} />
         </View>
 
-        {/* toggle */}
+        {/* Toggle */}
         <Pressable
           disabled={isAutoMode}
           onPress={() => onToggle(!isOn)}
           style={{
-            width: 42,
-            height: 24,
+            width: 54,
+            height: 30,
             borderRadius: 20,
+            paddingHorizontal: 4,
             justifyContent: 'center',
-            backgroundColor: isAutoMode
-              ? 'rgba(255,255,255,0.1)'
-              : isOn
-                ? '#fb923c'
-                : 'rgba(255,255,255,0.15)',
-            opacity: isAutoMode ? 0.65 : 1,
+            backgroundColor: isOn ? '#FDBA21' : '#ffffff08',
+            opacity: isAutoMode ? 0.5 : 1,
           }}>
           <View
             style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
+              width: 22,
+              height: 22,
+              borderRadius: 11,
               backgroundColor: 'white',
-              marginLeft: isOn ? 20 : 3,
+              alignSelf: isOn ? 'flex-end' : 'flex-start',
             }}
           />
         </Pressable>
       </View>
 
-      {/* title */}
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 16,
-          fontWeight: '600',
-          marginTop: 18,
-        }}>
-        {title}
-      </Text>
-
-      {/* status */}
-      <View
-        style={{
-          marginTop: 8,
-          alignSelf: 'flex-start',
-          backgroundColor: 'rgba(0,0,0,0.35)',
-          paddingHorizontal: 10,
-          paddingVertical: 4,
-          borderRadius: 20,
-        }}>
+      {/* Content */}
+      <View style={{ marginTop: 18 }}>
         <Text
           style={{
             color: 'white',
-            fontSize: 12,
+            fontSize: 24,
+            fontWeight: '700',
           }}>
-          {isAutoMode ? 'AUTO' : isOn ? 'ON' : 'OFF'}
+          {title}
         </Text>
+
+        {/* Status Badge */}
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            marginTop: 12,
+            paddingHorizontal: 14,
+            paddingVertical: 6,
+            borderRadius: 999,
+            backgroundColor: isOn ? '#FDBA212D' : '#ffffff08',
+          }}>
+          <Text style={{ color: isOn ? '#facc15' : '#9ca3af', fontWeight: '700', fontSize: 12 }}>
+            {isOn ? 'ON' : 'OFF'}
+          </Text>
+        </View>
       </View>
     </View>
   );
